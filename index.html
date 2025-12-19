@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALO Project Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { rcem: { purple: '#2d2e83', orange: '#f36f21' } } } } }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+</head>
+<body class="bg-slate-100 text-slate-900 h-screen overflow-hidden flex flex-col">
+
+    <div class="flex flex-1 overflow-hidden relative">
+        
+        <aside id="app-sidebar" class="w-64 bg-slate-900 text-white flex-col h-full flex shrink-0">
+            <div class="p-6 border-b border-white/10">
+                <h1 class="font-bold text-xl tracking-tight">HALO Project</h1>
+                <p class="text-xs text-slate-400">RCEM QIP Assistant</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+                <button onclick="window.router('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-slate-300"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> <span class="font-medium">Dashboard</span></button>
+                <button onclick="window.router('checklist')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-slate-300"><i data-lucide="check-square" class="w-5 h-5"></i> <span class="font-medium">Checklist</span></button>
+                <button onclick="window.router('data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-slate-300"><i data-lucide="bar-chart-2" class="w-5 h-5"></i> <span class="font-medium">Data & Charts</span></button>
+                <button onclick="window.router('tools')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-slate-300"><i data-lucide="wrench" class="w-5 h-5"></i> <span class="font-medium">Strategy Tools</span></button>
+                <button onclick="window.router('pdsa')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-slate-300"><i data-lucide="refresh-cw" class="w-5 h-5"></i> <span class="font-medium">PDSA Cycles</span></button>
+                <button onclick="window.router('halo')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-all text-emerald-400 font-bold"><i data-lucide="book-open" class="w-5 h-5"></i> <span class="font-medium">HALO Protocols</span></button>
+            </nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-slate-100 p-8 relative">
+            
+            <div id="view-dashboard" class="view-section space-y-6 fade-in">
+                <header class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-slate-800">Dashboard</h2>
+                        <p class="text-slate-500">Project Status: <span class="text-emerald-600 font-bold">Active (Cycle 1)</span></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="window.generateReport()" class="bg-white border border-slate-300 px-4 py-2 rounded shadow-sm hover:bg-slate-50 flex gap-2 items-center"><i data-lucide="file-text" class="w-4 h-4"></i> Report</button>
+                        <button onclick="window.saveData()" class="bg-rcem-purple text-white px-4 py-2 rounded shadow hover:bg-indigo-900 flex gap-2 items-center"><i data-lucide="save" class="w-4 h-4"></i> Save</button>
+                    </div>
+                </header>
+                
+                <div class="bg-indigo-600 rounded-xl p-6 text-white shadow-lg relative overflow-hidden mb-6">
+                    <div class="absolute top-0 right-0 p-4 opacity-10"><i data-lucide="compass" class="w-32 h-32"></i></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-2"><span class="bg-white/20 px-2 py-1 rounded text-xs font-bold uppercase">Current Phase</span><h3 class="font-bold text-lg">PDSA Cycle 1: Implementation</h3></div>
+                        <p class="text-indigo-100 text-sm mb-4 max-w-3xl">You have defined the problem (low confidence in HALO) and planned the intervention (Trolley + Booklet). <br><strong>Next Step:</strong> Conduct the Week 1 briefing and verify trolley contents.</p>
+                        <button onclick="window.router('pdsa')" class="bg-white text-indigo-700 px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-50 inline-flex items-center gap-2">View Cycle Plan <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+
+                <div id="stats-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            </div>
+
+            <div id="view-checklist" class="view-section hidden max-w-4xl mx-auto fade-in">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">QIAT Checklist</h2>
+                <div id="checklist-container" class="space-y-4"></div>
+            </div>
+
+            <div id="view-data" class="view-section hidden fade-in">
+                <header class="mb-6 flex justify-between items-end">
+                    <div><h2 class="text-3xl font-bold text-slate-800">Data: Staff Readiness</h2><p class="text-slate-500">Tracking % of staff confident/aware of location.</p></div>
+                    <button onclick="window.addDataPoint()" class="bg-rcem-purple text-white px-4 py-2 rounded shadow">Add Survey Point</button>
+                </header>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="glass p-6 rounded-xl shadow-sm h-fit">
+                        <h3 class="font-bold mb-4">Add Survey Result</h3>
+                        <div class="space-y-4">
+                            <input type="date" id="chart-date" class="w-full border p-2 rounded">
+                            <input type="number" id="chart-value" class="w-full border p-2 rounded" placeholder="% Staff Confident (Avg)">
+                            <input type="text" id="chart-note" class="w-full border p-2 rounded" placeholder="Note (e.g. Post-induction)">
+                            <input type="hidden" id="chart-type" value="data">
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 glass p-6 rounded-xl shadow-sm">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-tools" class="view-section hidden h-full flex flex-col fade-in">
+                <header class="mb-6"><h2 class="text-3xl font-bold text-slate-800">Strategy Tools</h2></header>
+                <div class="flex gap-2 mb-4 bg-slate-200 p-1 rounded-lg w-fit">
+                    <button onclick="window.setToolMode('driver')" class="px-4 py-2 rounded bg-white shadow text-sm font-bold">Driver Diagram</button>
+                    <button onclick="window.setToolMode('fishbone')" class="px-4 py-2 rounded hover:bg-white/50 text-sm">Fishbone</button>
+                </div>
+                <div id="tool-canvas" class="flex-1 glass rounded-xl shadow-sm p-8 bg-white overflow-auto flex items-center justify-center"></div>
+            </div>
+
+            <div id="view-pdsa" class="view-section hidden fade-in">
+                <header class="mb-6 flex justify-between items-center">
+                    <h2 class="text-3xl font-bold text-slate-800">PDSA Cycles</h2>
+                    <button onclick="window.addPDSACycle()" class="bg-rcem-purple text-white px-4 py-2 rounded">New Cycle</button>
+                </header>
+                <div id="pdsa-list" class="space-y-6 max-w-4xl"></div>
+            </div>
+
+            <div id="view-halo" class="view-section hidden fade-in">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-slate-800 flex items-center gap-2"><i data-lucide="book-open" class="text-emerald-600"></i> HALO Digital Protocols</h2>
+                    <p class="text-slate-500">Quick reference summaries extracted from Master 2025 Guide.</p>
+                </header>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="halo-grid">
+                    </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
