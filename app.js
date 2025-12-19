@@ -3,17 +3,17 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 // --- YOUR HALO PROJECT DATA ---
-// I have pre-filled this based on "HALO QIP Document Dec 2025.docx"
+[cite_start]// Pre-filled from "HALO QIP Document Dec 2025.docx" [cite: 1339-1361]
 let projectData = {
     checklist: {
         title: "HALO Procedures Readiness Project",
         lead: "[Your Name]",
         team: "EM Consultants, Senior Sisters, Pharmacy",
-        problem_desc: "Variation in staff confidence and awareness of High Acuity, Low Occurrence (HALO) emergency procedures. Baseline survey (Oct 2025) revealed widespread uncertainty about equipment locations (e.g. Canthotomy kit) and low confidence in performing procedures.",
-        evidence: "Baseline Survey (n=16): Majority did not know equipment locations for 4/6 procedures. >80% reported 'not confident' for Hysterotomy/Escharotomy.",
+        problem_desc: "Variation in staff confidence and awareness of HALO procedures. Baseline survey (Oct 2025) revealed widespread uncertainty about equipment locations and low confidence.",
+        evidence: "Baseline Survey (n=16): Majority did not know locations for 4/6 procedures. >80% reported 'not confident' for Hysterotomy/Escharotomy.",
         aim: "To increase staff awareness of equipment locations and confidence to perform/assist with 6 key HALO procedures to ≥90% by June 2026.",
         strategy_summary: "Centralisation of equipment (HALO Trolley) and Cognitive Aids (Laminated Booklets), supported by handover teaching.",
-        results_summary: "Baseline: ~20% knowledge of locations. Cycle 1 in progress."
+        results_summary: "Baseline: ~20% knowledge. Cycle 1 Implementation in progress."
     },
     drivers: {
         primary: ["Equipment Accessibility", "Cognitive Support", "Staff Engagement"],
@@ -25,27 +25,28 @@ let projectData = {
             id: "1",
             title: "Cycle 1: Trolley & Booklet",
             date: "2025-11-01",
-            plan: "Introduce a dedicated HALO procedures trolley with attached aide-memoires in the Resus area. Predict >90% awareness in follow-up.",
-            do: "Week 1: Finalise trolley contents & print booklets. Week 2: Departmental briefing & positioning of trolley.",
-            study: "Repeat staff survey in Jan 2026 (3 months post-implementation). Track trolley checklist compliance.",
-            act: "If successful, embed as permanent fixture and add to induction. If not, refine booklet design."
+            plan: "Introduce a dedicated HALO procedures trolley with attached aide-memoires. Predict >90% awareness in follow-up.",
+            do: "Week 1: Finalise trolley contents & print booklets. Week 2: Departmental briefing & positioning.",
+            study: "Repeat staff survey in Jan 2026. Track trolley checklist compliance.",
+            act: "If successful, embed as permanent fixture and add to induction."
         }
     ],
-    // Baseline data point estimate (20% confidence) based on your document
+    [cite_start]// Baseline data point based on your document [cite: 1382]
     chartData: [
         { date: "2025-10-31", value: "20", type: "data", note: "Baseline Survey" },
-        { date: "2025-11-15", value: "0", type: "intervention", note: "Cycle 1: Trolley Launch" }
+        { date: "2025-11-15", value: "0", type: "intervention", note: "Cycle 1 Launch" }
     ],
-    chartGoal: 90,
-    fishbone: { categories: [] }, // Kept empty as Driver Diagram is more relevant
-    gantt: []
+    chartGoal: 90
 };
 
-// --- HALO PROTOCOLS CONTENT (From your PDF) ---
+// --- HALO PROTOCOLS CONTENT ---
+[cite_start]// Digitised from "HALO QRH.pdf" [cite: 548-1193]
 const haloProtocols = [
     {
         title: "Resuscitative Hysterotomy",
         tags: "Obstetric • Arrest",
+        icon: "baby",
+        color: "rose",
         steps: [
             "<strong>Location:</strong> Operate on trolley. Do NOT move to theatre.",
             "<strong>Incision:</strong> Midline Vertical from Xiphisternum to Pubis.",
@@ -58,6 +59,8 @@ const haloProtocols = [
     {
         title: "Resuscitative Thoracotomy",
         tags: "Trauma • Arrest",
+        icon: "heart",
+        color: "red",
         steps: [
             "<strong>Incision:</strong> Clamshell (5th ICS, Mid-Axillary to Mid-Axillary).",
             "<strong>Open:</strong> Cut Sternum with Gigli/Shears. Retract ribs.",
@@ -69,6 +72,8 @@ const haloProtocols = [
     {
         title: "Surgical Airway (eFONA)",
         tags: "Airway • CICO",
+        icon: "wind",
+        color: "blue",
         steps: [
             "<strong>Declare:</strong> 'CICO'. Extend neck maximally.",
             "<strong>Identify:</strong> Laryngeal Handshake -> CTM.",
@@ -81,6 +86,8 @@ const haloProtocols = [
     {
         title: "Lateral Canthotomy",
         tags: "Eye • Vision Loss",
+        icon: "eye",
+        color: "amber",
         steps: [
             "<strong>Prep:</strong> LA with Adrenaline.",
             "<strong>Crush:</strong> Clamp lateral canthus (1 min).",
@@ -93,6 +100,8 @@ const haloProtocols = [
     {
         title: "Escharotomy",
         tags: "Burns • Circulation",
+        icon: "flame",
+        color: "orange",
         steps: [
             "<strong>Chest:</strong> Roman Breastplate (Ant Axillary Lines + Cross bars).",
             "<strong>Limbs:</strong> Mid-Lateral & Mid-Medial lines.",
@@ -102,23 +111,21 @@ const haloProtocols = [
         alert: "Ensure chest wall 'springs' open."
     },
     {
-        title: "Chest Drain (Open)",
-        tags: "Trauma • Haemothorax",
+        title: "Severe Max-Fax Bleed",
+        tags: "Trauma • Airway",
+        icon: "skull",
+        color: "slate",
         steps: [
-            "<strong>Site:</strong> 5th ICS, Anterior Axillary Line.",
-            "<strong>Incision:</strong> 3cm Transverse.",
-            "<strong>Dissect:</strong> Bluntly over UPPER border of lower rib.",
-            "<strong>Entry:</strong> 'Pop' pleura. Finger sweep (360 degrees).",
-            "<strong>Insert:</strong> 28-32F Tube. Fogging + Swinging."
+            "<strong>Position:</strong> Sit up/Lean forward if conscious.",
+            "<strong>Midface:</strong> Pull maxilla FORWARD to disimpact (Floating Face).",
+            "<strong>Pack:</strong> Bilateral Rapid Rhinos or Foley catheters (inflate & pull back).",
+            "<strong>Adjuncts:</strong> TXA 1g. Bite block to maintain airway."
         ],
-        alert: "Finger sweep is mandatory."
+        alert: "Intubate early. Avoid nasal route."
     }
 ];
 
 // --- APP LOGIC ---
-
-// ... [Include Firebase Config & Auth Logic from previous app.js here] ...
-// (For brevity, assuming standard Firebase setup is kept)
 
 window.router = (viewId) => {
     document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
@@ -126,44 +133,52 @@ window.router = (viewId) => {
     if(viewId === 'tools') renderTools();
     if(viewId === 'data') renderChart();
     if(viewId === 'halo') renderHalo();
+    if(viewId === 'dashboard') renderDashboard();
+    if(viewId === 'checklist') renderChecklist();
+    if(viewId === 'pdsa') renderPDSA();
 };
 
 function renderDashboard() {
-    // Stats
     const checklistCount = Object.values(projectData.checklist).filter(Boolean).length;
-    const progress = Math.round((checklistCount / 8) * 100); // Approx
+    const progress = Math.round((checklistCount / 8) * 100); 
     
     document.getElementById('stats-grid').innerHTML = `
         <div class="glass p-6 rounded-xl border-l-4 border-emerald-500">
-            <div class="text-slate-500 text-sm font-bold uppercase">Checklist</div>
+            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Checklist</div>
             <div class="text-3xl font-bold text-slate-800">${progress}%</div>
         </div>
         <div class="glass p-6 rounded-xl border-l-4 border-indigo-500">
-            <div class="text-slate-500 text-sm font-bold uppercase">PDSA Cycles</div>
+            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">PDSA Cycles</div>
             <div class="text-3xl font-bold text-slate-800">${projectData.pdsa.length}</div>
         </div>
         <div class="glass p-6 rounded-xl border-l-4 border-amber-500">
-            <div class="text-slate-500 text-sm font-bold uppercase">Baseline Knowledge</div>
-            <div class="text-3xl font-bold text-slate-800">~20%</div>
+            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider">Baseline Confidence</div>
+            <div class="text-3xl font-bold text-slate-800">20%</div>
         </div>
     `;
 }
 
-// Renders your specific HALO Protocols
+// Renders the specific HALO Protocols
 function renderHalo() {
     const grid = document.getElementById('halo-grid');
     grid.innerHTML = haloProtocols.map(p => `
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all">
             <div class="bg-slate-50 p-4 border-b border-slate-100 flex justify-between items-start">
-                <h3 class="font-bold text-slate-800 text-lg">${p.title}</h3>
-                <span class="bg-slate-200 text-slate-600 text-xs px-2 py-1 rounded-full font-medium">${p.tags}</span>
-            </div>
-            <div class="p-4">
-                <div class="mb-4 bg-red-50 text-red-700 text-xs p-2 rounded border border-red-100 font-bold">
-                    <i data-lucide="alert-circle" class="w-3 h-3 inline mr-1"></i> ${p.alert}
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-${p.color}-100 rounded-lg text-${p.color}-600">
+                        <i data-lucide="${p.icon}" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg leading-tight">${p.title}</h3>
                 </div>
-                <ol class="list-decimal pl-4 space-y-2 text-sm text-slate-700">
-                    ${p.steps.map(s => `<li>${s}</li>`).join('')}
+            </div>
+            <div class="p-5">
+                <span class="inline-block bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-full font-bold mb-3 border border-slate-200">${p.tags}</span>
+                <div class="mb-4 bg-red-50 text-red-800 text-xs p-3 rounded border border-red-100 font-bold flex gap-2">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i> 
+                    <span>${p.alert}</span>
+                </div>
+                <ol class="list-decimal pl-4 space-y-3 text-sm text-slate-700">
+                    ${p.steps.map(s => `<li class="pl-1">${s}</li>`).join('')}
                 </ol>
             </div>
         </div>
@@ -172,7 +187,6 @@ function renderHalo() {
 }
 
 function renderChecklist() {
-    // Uses your custom HALO data
     const list = document.getElementById('checklist-container');
     const fields = [
         {k:'title', l:'Project Title'}, {k:'problem_desc', l:'Problem'}, 
@@ -180,23 +194,26 @@ function renderChecklist() {
         {k:'strategy_summary', l:'Strategy'}, {k:'results_summary', l:'Results'}
     ];
     list.innerHTML = fields.map(f => `
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">${f.l}</label>
-            <div class="text-slate-800 text-sm whitespace-pre-wrap">${projectData.checklist[f.k] || '...'}</div>
+        <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-wide">${f.l}</label>
+            <div class="text-slate-800 text-sm whitespace-pre-wrap leading-relaxed">${projectData.checklist[f.k] || '...'}</div>
         </div>
     `).join('');
 }
 
 function renderTools() {
-    // Forces Driver Diagram view for HALO
+    // Automatically renders the Driver Diagram from the QIP Document
     const container = document.getElementById('tool-canvas');
     const d = projectData.drivers;
-    // Construct Mermaid graph
+    
     let mm = `graph LR\n  AIM[Aim: 90% Confidence] --> P[Primary Drivers]\n  P --> S[Secondary Drivers]\n  S --> C[Change Ideas]\n`;
     d.primary.forEach((x,i) => mm += `P --> P${i}[${x}]\n`);
     d.secondary.forEach((x,i) => mm += `S --> S${i}[${x}]\n`);
     d.changes.forEach((x,i) => mm += `C --> C${i}[${x}]\n`);
     
+    // Styling the nodes for professional look
+    mm += `classDef default fill:#fff,stroke:#333,stroke-width:1px; classDef aim fill:#2d2e83,color:#fff,stroke:none; class AIM aim;`;
+
     container.innerHTML = `<div class="mermaid">${mm}</div>`;
     mermaid.init(undefined, container.querySelectorAll('.mermaid'));
 }
@@ -204,29 +221,102 @@ function renderTools() {
 function renderChart() {
     const ctx = document.getElementById('mainChart').getContext('2d');
     const data = projectData.chartData;
-    // Simple Chart.js rendering (omitted for brevity, same as previous but uses projectData.chartData)
-    // ... [Insert Chart Code] ...
+    
+    // Sort
+    data.sort((a,b) => new Date(a.date) - new Date(b.date));
+    const labels = data.map(d => d.date);
+    const values = data.map(d => d.type === 'data' ? d.value : null); // Only plot data points, not interventions
+
+    // Annotations for Cycle 1
+    const annotations = {};
+    data.filter(d => d.type === 'intervention').forEach((d, i) => {
+        annotations[`line${i}`] = {
+            type: 'line',
+            scaleID: 'x',
+            value: d.date,
+            borderColor: '#f36f21',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            label: { display: true, content: d.note, position: 'start', backgroundColor: '#f36f21', color: 'white' }
+        };
+    });
+    
+    // Goal Line
+    annotations['goal'] = {
+        type: 'line',
+        yMin: projectData.chartGoal,
+        yMax: projectData.chartGoal,
+        borderColor: '#10b981',
+        borderWidth: 2,
+        label: { display: true, content: 'Target (90%)', position: 'end', backgroundColor: '#10b981', color:'white' }
+    };
+
+    if(window.myChart) window.myChart.destroy();
+
+    window.myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '% Staff Confidence',
+                data: values,
+                borderColor: '#2d2e83',
+                backgroundColor: 'rgba(45, 46, 131, 0.1)',
+                tension: 0.3,
+                spanGaps: true,
+                pointRadius: 6,
+                pointBackgroundColor: '#2d2e83'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { annotation: { annotations } },
+            scales: {
+                y: { beginAtZero: true, max: 100, title: {display: true, text: '% Confidence'} }
+            }
+        }
+    });
 }
 
 function renderPDSA() {
     const list = document.getElementById('pdsa-list');
     list.innerHTML = projectData.pdsa.map(p => `
         <div class="bg-white rounded-xl shadow-sm border border-l-4 border-l-rcem-purple overflow-hidden">
-            <div class="p-4 bg-slate-50 border-b flex justify-between">
-                <h3 class="font-bold text-rcem-purple">${p.title}</h3>
-                <span class="text-xs text-slate-500">${p.date}</span>
+            <div class="p-4 bg-slate-50 border-b flex justify-between items-center">
+                <h3 class="font-bold text-rcem-purple text-lg">${p.title}</h3>
+                <span class="text-xs font-mono text-slate-500 bg-white px-2 py-1 rounded border">${p.date}</span>
             </div>
-            <div class="p-4 grid grid-cols-2 gap-4 text-sm">
-                <div><span class="font-bold block text-xs uppercase text-slate-400">Plan</span>${p.plan}</div>
-                <div><span class="font-bold block text-xs uppercase text-slate-400">Do</span>${p.do}</div>
-                <div><span class="font-bold block text-xs uppercase text-slate-400">Study</span>${p.study}</div>
-                <div><span class="font-bold block text-xs uppercase text-slate-400">Act</span>${p.act}</div>
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                <div><span class="font-bold block text-xs uppercase text-slate-400 mb-1">Plan</span><p class="text-slate-700">${p.plan}</p></div>
+                <div><span class="font-bold block text-xs uppercase text-slate-400 mb-1">Do</span><p class="text-slate-700">${p.do}</p></div>
+                <div><span class="font-bold block text-xs uppercase text-slate-400 mb-1">Study</span><p class="text-slate-700">${p.study}</p></div>
+                <div><span class="font-bold block text-xs uppercase text-slate-400 mb-1">Act</span><p class="text-slate-700">${p.act}</p></div>
             </div>
         </div>
     `).join('');
 }
 
-// Global scope
-window.saveData = () => { alert("In a real app, this would save to Firebase!"); };
-window.router('dashboard'); // Init
-renderDashboard();
+// Global functions exposed to HTML
+window.generateReport = () => {
+    const el = document.getElementById('view-checklist');
+    html2pdf().from(el).save('HALO_QIP_Report.pdf');
+};
+window.saveData = () => { alert("Data Saved! (In a full app this connects to Firebase)"); };
+window.addDataPoint = () => {
+    // Simulation
+    const val = prompt("Enter % Confidence:");
+    const note = prompt("Enter Note (optional):");
+    if(val) {
+        projectData.chartData.push({ date: new Date().toISOString().split('T')[0], value: val, type: 'data', note: note });
+        renderChart();
+    }
+};
+window.addPDSACycle = () => {
+    alert("In the full app, this opens the PDSA wizard.");
+};
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    window.router('dashboard');
+    lucide.createIcons();
+});
