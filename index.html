@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HALO QIP | Emergency Procedures</title>
+    <title>HALO QIP | Resus Readiness</title>
     
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -17,9 +16,9 @@
             theme: {
                 extend: {
                     colors: {
-                        slate: { 850: '#1e293b', 900: '#0f172a' },
-                        rcem: { purple: '#2d2e83', orange: '#f36f21', teal: '#008080' },
-                        halo: { red: '#b71c1c', blue: '#0d47a1', purple: '#4a148c', pink: '#880e4f' }
+                        rcem: { purple: '#2d2e83', orange: '#f36f21' },
+                        halo: { red: '#b71c1c', blue: '#0d47a1', pink: '#880e4f', teal: '#006064' },
+                        slate: { 850: '#1e293b', 900: '#0f172a' }
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Merriweather', 'serif'] },
                     screens: { 'print': {'raw': 'print'} }
@@ -30,100 +29,110 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-100 text-slate-900 h-screen overflow-hidden flex flex-col bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+<body class="bg-slate-50 text-slate-900 h-full overflow-hidden flex flex-col font-sans">
 
-    <div id="ig-banner" class="bg-amber-100 dark:bg-amber-900 border-b border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-4 py-2 text-xs md:text-sm font-medium flex justify-between items-center z-50 no-print">
+    <div id="ig-banner" class="bg-amber-100 border-b border-amber-200 text-amber-900 px-4 py-2 text-xs font-medium flex justify-between items-center z-50 no-print">
         <div class="flex items-center gap-2">
-            <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
-            <span><strong>CONFIDENTIAL:</strong> QIP Data Only. Do NOT enter patient identifiers.</span>
+            <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600"></i>
+            <span><strong>IG ALERT:</strong> QIP Data Only. No patient identifiers.</span>
         </div>
-        <button onclick="document.getElementById('ig-banner').remove()" class="text-amber-700 hover:text-amber-900"><i data-lucide="x" class="w-4 h-4"></i></button>
+        <button onclick="this.parentElement.remove()" class="text-amber-700 hover:text-amber-900"><i data-lucide="x" class="w-4 h-4"></i></button>
     </div>
 
     <div class="flex flex-1 overflow-hidden relative">
         
-        <div id="auth-screen" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print">
-            <div class="glass bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden fade-in">
-                <div class="bg-white/50 p-8 text-center border-b border-slate-100/50">
-                    <div class="inline-flex items-center justify-center w-16 h-16 bg-rcem-purple rounded-full mb-4 shadow-lg">
-                        <i data-lucide="zap" class="w-8 h-8 text-white"></i>
-                    </div>
-                    <h1 class="text-2xl font-bold text-slate-900">HALO QIP Portal</h1>
-                    <p class="text-slate-500 mt-1">High Acuity Low Occurrence Procedures</p>
-                </div>
-                <div class="p-8">
-                    <form id="auth-form" class="space-y-4">
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase">Email</label>
-                            <input type="email" id="email" required class="w-full p-3 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-rcem-purple" placeholder="doctor@nhs.net">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase">Password</label>
-                            <input type="password" id="password" class="w-full p-3 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-rcem-purple" placeholder="••••••••">
-                        </div>
-                        <button type="submit" id="auth-btn" class="w-full bg-rcem-purple hover:bg-indigo-900 text-white font-bold py-3 rounded-lg shadow-lg transition-all">Sign In</button>
-                    </form>
-                    <button id="demo-btn" class="w-full mt-3 bg-white border border-slate-300 text-slate-600 font-bold py-3 rounded-lg hover:bg-slate-50 flex justify-center items-center gap-2 transition-all"><i data-lucide="eye" class="w-4 h-4"></i> View Project Data</button>
-                </div>
-            </div>
-        </div>
-
-        <aside id="app-sidebar" class="hidden w-64 bg-slate-900/95 backdrop-blur-xl text-white flex-col h-full fixed lg:static z-20 shadow-2xl transition-all duration-300 no-print border-r border-white/10">
+        <aside id="app-sidebar" class="hidden w-64 bg-slate-900 text-white flex-col h-full fixed lg:static z-20 shadow-2xl no-print transition-all duration-300">
             <div class="p-6 border-b border-white/10 flex flex-col items-center">
+                <div class="bg-white/10 p-2 rounded-lg mb-3"><i data-lucide="zap" class="w-8 h-8 text-yellow-400"></i></div>
                 <div class="text-center">
-                    <h1 class="font-bold text-2xl tracking-tight text-white mb-1">HALO QIP</h1>
-                    <p class="text-xs text-slate-400 uppercase tracking-widest">Resuscitation Readiness</p>
+                    <h1 class="font-bold text-lg tracking-tight">HALO QIP</h1>
+                    <p class="text-xs text-slate-400">Resus Readiness</p>
                 </div>
             </div>
             
-            <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-3 mt-4">Project Management</div>
+            <nav class="flex-1 p-3 space-y-1 overflow-y-auto" id="nav-menu">
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-3 mt-2">Management</div>
                 <button onclick="window.router('dashboard')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition-all" id="nav-dashboard"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</button>
-                <button onclick="window.router('checklist')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition-all" id="nav-checklist"><i data-lucide="clipboard-list" class="w-4 h-4"></i> QIAT Checklist</button>
+                <button onclick="window.router('checklist')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition-all" id="nav-checklist"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Define & Measure</button>
                 <button onclick="window.router('pdsa')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition-all" id="nav-pdsa"><i data-lucide="refresh-cw" class="w-4 h-4"></i> PDSA Cycles</button>
                 
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-3 mt-4">Analysis & Data</div>
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-3 mt-4">Analysis</div>
                 <button onclick="window.router('tools')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition-all" id="nav-tools"><i data-lucide="git-branch" class="w-4 h-4"></i> Driver Diagram</button>
-                <button onclick="window.router('data')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition-all" id="nav-data"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> Run Charts</button>
+                <button onclick="window.router('data')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition-all" id="nav-data"><i data-lucide="line-chart" class="w-4 h-4"></i> Data & SPC</button>
 
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-3 mt-4">Clinical Resources</div>
-                <button onclick="window.router('protocols')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-amber-400 bg-amber-900/20 hover:bg-amber-900/40 hover:text-amber-300 transition-all border border-amber-900/50" id="nav-protocols"><i data-lucide="book-open" class="w-4 h-4"></i> <strong>Protocols</strong></button>
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-3 mt-4">Resources</div>
+                <button onclick="window.router('protocols')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-lg text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 hover:text-amber-200 transition-all border border-amber-700/30" id="nav-protocols"><i data-lucide="book-open" class="w-4 h-4"></i> <strong>Protocols</strong></button>
             </nav>
 
-            <div class="p-4 border-t border-white/10 bg-slate-900/50">
+            <div class="p-4 border-t border-white/10 bg-slate-900">
+                <button onclick="window.loadProjectList()" class="w-full flex items-center gap-2 text-slate-400 hover:text-white px-2 py-2 rounded hover:bg-white/5 text-xs mb-1"><i data-lucide="folder-open" class="w-3 h-3"></i> Switch Project</button>
                 <button id="logout-btn" class="w-full flex items-center gap-2 text-slate-400 hover:text-white px-2 py-2 rounded hover:bg-white/5 text-xs"><i data-lucide="log-out" class="w-3 h-3"></i> Sign Out</button>
             </div>
         </aside>
 
-        <main id="main-content" class="hidden flex-1 overflow-y-auto bg-slate-50 relative w-full no-print">
-            <button id="mobile-menu-btn" class="lg:hidden absolute top-4 right-4 z-30 bg-slate-900 text-white p-2 rounded-md shadow-lg"><i data-lucide="menu"></i></button>
-
-            <div class="glass sticky top-0 z-20 px-6 py-3 flex justify-between items-center shadow-sm border-b border-slate-200 bg-white/80 backdrop-blur-md">
-                <div class="flex items-center gap-3">
-                    <h2 class="font-bold text-slate-700" id="page-title">Dashboard</h2>
-                    <span id="save-status" class="text-xs text-emerald-600 font-bold transition-opacity opacity-0 flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Saved</span>
-                </div>
-                <div id="user-display" class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-600"></div>
+        <main class="flex-1 overflow-hidden relative bg-slate-50 w-full flex flex-col" id="main-wrapper">
+            
+            <div class="lg:hidden bg-slate-900 text-white p-3 flex justify-between items-center z-30 no-print">
+                <span class="font-bold">HALO QIP</span>
+                <button id="mobile-menu-btn"><i data-lucide="menu"></i></button>
             </div>
 
-            <div id="toast-container"></div>
+            <div id="top-bar" class="hidden h-14 bg-white border-b border-slate-200 px-6 flex justify-between items-center z-20 no-print">
+                <div class="flex items-center gap-3">
+                    <h2 id="project-header-title" class="font-bold text-slate-700 truncate max-w-[300px]">HALO Project</h2>
+                    <span id="save-status" class="text-xs text-emerald-600 font-bold transition-opacity opacity-0 flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Saved</span>
+                </div>
+                <div class="flex items-center gap-3">
+                     <div id="user-display" class="text-xs font-mono bg-slate-100 px-2 py-1 rounded text-slate-600"></div>
+                </div>
+            </div>
 
-            <div id="content-area" class="p-4 md:p-8 pb-20 max-w-7xl mx-auto">
+            <div id="content-area" class="flex-1 overflow-y-auto relative scroll-smooth p-4 md:p-8 pb-20">
 
-                <div id="view-dashboard" class="view-section space-y-6 fade-in">
-                    <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-center gap-4 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 opacity-10 p-4"><i data-lucide="activity" class="w-32 h-32"></i></div>
-                        <div class="relative z-10">
-                            <h2 class="text-xl font-bold mb-1">Project Status: PDSA Cycle 1 Active</h2>
-                            <p class="text-slate-300 text-sm">Intervention: Introduction of HALO Trolley & Aide-Memoires.</p>
+                <div id="auth-screen" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4">
+                    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                        <div class="bg-slate-50 p-8 text-center border-b border-slate-100">
+                            <div class="mx-auto bg-rcem-purple text-white w-12 h-12 rounded-full flex items-center justify-center mb-3"><i data-lucide="zap" class="w-6 h-6"></i></div>
+                            <h1 class="text-2xl font-bold text-slate-900">HALO QIP Portal</h1>
+                            <p class="text-slate-500 text-sm mt-1">High Acuity Low Occurrence Procedures</p>
                         </div>
-                        <div class="flex gap-2 relative z-10">
-                            <button onclick="window.printPoster()" class="bg-white text-slate-900 px-4 py-2 rounded-lg font-bold text-sm shadow hover:bg-slate-100 flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Print Poster</button>
-                            <button onclick="window.router('protocols')" class="bg-rcem-purple text-white px-4 py-2 rounded-lg font-bold text-sm shadow hover:bg-indigo-800 flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4"></i> View Protocols</button>
+                        <div class="p-8 space-y-4">
+                            <form id="auth-form" class="space-y-4">
+                                <div>
+                                    <label class="text-xs font-bold text-slate-500 uppercase">Email</label>
+                                    <input type="email" id="email" required class="w-full p-3 rounded border border-slate-300 text-sm focus:ring-2 focus:ring-rcem-purple outline-none" placeholder="doctor@nhs.net">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-slate-500 uppercase">Password</label>
+                                    <input type="password" id="password" class="w-full p-3 rounded border border-slate-300 text-sm focus:ring-2 focus:ring-rcem-purple outline-none" placeholder="••••••••">
+                                </div>
+                                <button type="submit" class="w-full bg-rcem-purple hover:bg-indigo-900 text-white font-bold py-3 rounded shadow transition-all">Sign In</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-projects" class="view-section hidden max-w-6xl mx-auto">
+                    <header class="mb-8 flex justify-between items-center">
+                        <h1 class="text-3xl font-bold text-slate-900">My Projects</h1>
+                        <button onclick="window.createNewProject()" class="bg-rcem-purple text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-900 flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> New Project</button>
+                    </header>
+                    <div id="project-list" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+                </div>
+
+                <div id="view-dashboard" class="view-section hidden space-y-6">
+                    <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+                        <div class="absolute right-0 top-0 opacity-10 p-4"><i data-lucide="activity" class="w-32 h-32"></i></div>
+                        <div class="relative z-10 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-bold text-lg">Current Status: PDSA Cycle 1 Active</h3>
+                                <p class="text-slate-300 text-sm">Intervention: Introduction of HALO Trolley & Aide-Memoires.</p>
+                            </div>
+                            <button onclick="window.printPoster()" class="bg-white text-slate-900 px-4 py-2 rounded shadow hover:bg-slate-100 font-bold flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Poster</button>
                         </div>
                     </div>
 
@@ -143,96 +152,78 @@
                             <div class="text-3xl font-bold text-slate-800">>90%</div>
                             <div class="text-xs text-slate-400 mt-1">By June 2026</div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
-                            <div class="text-slate-500 text-xs uppercase font-bold mb-1">Staff Support</div>
-                            <div class="text-3xl font-bold text-slate-800">94%</div>
-                            <div class="text-xs text-slate-400 mt-1">Want HALO Trolley</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-                        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-rcem-purple"></i> SMART Aim</h3>
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-slate-700 italic font-serif text-lg leading-relaxed">
-                            "To improve staff readiness for HALO procedures by increasing awareness of equipment locations and confidence to perform or assist to ≥90% by June 2026."
+                         <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                            <div class="text-slate-500 text-xs uppercase font-bold mb-1">Trolley Checks</div>
+                            <div class="text-3xl font-bold text-slate-800" id="stat-data">0</div>
+                            <div class="text-xs text-slate-400 mt-1">Data Points Logged</div>
                         </div>
                     </div>
                 </div>
 
-                <div id="view-checklist" class="view-section hidden max-w-4xl mx-auto space-y-6 fade-in">
+                <div id="view-checklist" class="view-section hidden max-w-4xl mx-auto space-y-6">
+                    <header class="flex justify-between items-center"><h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2"><i data-lucide="clipboard-check" class="text-rcem-purple"></i> Define & Measure</h2></header>
                     <div id="checklist-container" class="space-y-4"></div>
                 </div>
 
-                <div id="view-data" class="view-section hidden fade-in">
+                <div id="view-tools" class="view-section hidden h-full flex flex-col">
+                    <header class="flex justify-between items-center mb-4">
+                         <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2"><i data-lucide="git-branch" class="text-rcem-purple"></i> Driver Diagram</h2>
+                         <button onclick="window.renderTools()" class="text-sm bg-white border px-3 py-1 rounded">Refresh</button>
+                    </header>
+                    <div class="flex-1 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+                        <div id="diagram-wrapper" class="w-full h-full flex items-center justify-center bg-[url('https://www.transparenttextures.com/patterns/graphy.png')]">
+                            <div id="diagram-canvas"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-data" class="view-section hidden space-y-6">
+                    <header class="flex justify-between items-center"><h2 class="text-2xl font-bold text-slate-800">Survey & Compliance Data</h2></header>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="bg-white p-6 rounded-xl shadow-sm h-fit">
-                            <h3 class="font-bold text-lg mb-4 text-slate-800">Add Survey Data</h3>
+                            <h3 class="font-bold text-slate-800 mb-4">Log Data</h3>
                             <div class="space-y-4">
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Date</label><input type="date" id="chart-date" class="w-full border p-2 rounded"></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Date</label><input type="date" id="chart-date" class="w-full p-2 border rounded"></div>
                                 <div>
                                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Metric</label>
-                                    <select id="chart-cat" class="w-full border p-2 rounded">
+                                    <select id="chart-cat" class="w-full p-2 border rounded">
                                         <option value="confidence">Staff Confidence %</option>
                                         <option value="location">Location Awareness %</option>
-                                        <option value="compliance">Trolley Checklist %</option>
+                                        <option value="compliance">Trolley Check Compliance %</option>
                                     </select>
                                 </div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Value (%)</label><input type="number" id="chart-val" class="w-full border p-2 rounded" placeholder="0-100"></div>
-                                <button onclick="window.addHaloData()" class="w-full bg-rcem-purple text-white py-2 rounded hover:bg-indigo-900 font-bold">Add Point</button>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Value</label><input type="number" id="chart-value" class="w-full p-2 border rounded"></div>
+                                <button onclick="window.addDataPoint()" class="w-full bg-rcem-purple text-white py-2 rounded font-bold">Add Entry</button>
                             </div>
-                            <div id="data-list" class="mt-6 max-h-60 overflow-y-auto text-sm"></div>
                         </div>
-                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm min-h-[400px]">
-                            <canvas id="haloChart"></canvas>
-                        </div>
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm"><canvas id="mainChart"></canvas></div>
                     </div>
                 </div>
 
-                <div id="view-tools" class="view-section hidden fade-in h-[70vh]">
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
-                        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                            <h3 class="font-bold">Driver Diagram</h3>
-                            <div class="flex gap-2">
-                                <button onclick="window.renderHaloDriver()" class="text-xs bg-white border px-2 py-1 rounded shadow-sm">Reset View</button>
-                                <button onclick="window.downloadDiagram()" class="text-xs bg-rcem-purple text-white px-2 py-1 rounded shadow-sm">Download PNG</button>
-                            </div>
-                        </div>
-                        <div id="diagram-wrapper" class="flex-1 overflow-hidden relative cursor-grab bg-[url('https://www.transparenttextures.com/patterns/graphy.png')]">
-                            <div id="diagram-canvas" class="w-full h-full flex items-center justify-center"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="view-protocols" class="view-section hidden fade-in">
-                    <header class="mb-6 flex justify-between items-center">
+                <div id="view-protocols" class="view-section hidden space-y-6">
+                     <header class="mb-6 flex justify-between items-center">
                         <div>
                             <h2 class="text-3xl font-bold text-slate-800 flex items-center gap-3"><i data-lucide="book-open" class="text-amber-500"></i> HALO Handbook</h2>
-                            <p class="text-slate-500">Quick Reference Guides (2025 Edition)</p>
+                            <p class="text-slate-500">Quick Reference Guides (Embedded)</p>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="window.print()" class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg shadow-sm hover:bg-slate-50 flex items-center gap-2 font-medium"><i data-lucide="printer" class="w-4 h-4"></i> Print Guides</button>
-                        </div>
+                        <button onclick="window.print()" class="bg-white border border-slate-300 text-slate-700 px-4 py-2 rounded-lg shadow-sm font-medium"><i data-lucide="printer" class="w-4 h-4 inline"></i> Print</button>
                     </header>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="protocol-grid"></div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="protocol-grid">
-                        </div>
-
-                    <div id="protocol-viewer" class="hidden fixed inset-0 bg-slate-900/90 z-[60] overflow-y-auto p-4 md:p-8 backdrop-blur-sm">
-                        <div class="bg-white rounded-xl shadow-2xl max-w-4xl mx-auto overflow-hidden relative min-h-[80vh]">
-                            <button onclick="document.getElementById('protocol-viewer').classList.add('hidden')" class="absolute top-4 right-4 bg-slate-100 hover:bg-slate-200 p-2 rounded-full z-50"><i data-lucide="x" class="w-6 h-6"></i></button>
-                            <div id="protocol-content" class="p-0"></div>
-                        </div>
+                    <div id="protocol-viewer" class="fixed inset-0 bg-slate-900/95 z-[70] hidden overflow-y-auto p-4 md:p-10">
+                         <button onclick="document.getElementById('protocol-viewer').classList.add('hidden')" class="fixed top-4 right-4 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full"><i data-lucide="x" class="w-8 h-8"></i></button>
+                         <div id="protocol-content" class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden min-h-[50vh]"></div>
                     </div>
                 </div>
 
-                <div id="view-pdsa" class="view-section hidden fade-in max-w-4xl mx-auto space-y-6">
-                    <div id="pdsa-container"></div>
-                </div>
+                <div id="view-pdsa" class="view-section hidden space-y-6"><div id="pdsa-container" class="space-y-4"></div></div>
 
             </div>
         </main>
     </div>
 
     <div id="print-container" class="hidden"></div>
+    <div id="risr-modal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"><div class="bg-white rounded p-6 w-full max-w-4xl h-[80vh] overflow-auto relative"><button onclick="this.parentElement.parentElement.classList.add('hidden')" class="absolute top-4 right-4"><i data-lucide="x"></i></button><div id="risr-content"></div></div></div>
 
     <script type="module" src="app.js"></script>
 </body>
