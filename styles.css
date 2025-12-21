@@ -1,22 +1,58 @@
-body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
-.fade-in { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-/* Glassmorphism Classes */
-.glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-.dark .glass {
-    background: rgba(30, 41, 59, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+/* HALO Colour Variables for Dynamic Styles */
+:root {
+    --halo-red: #b71c1c;
+    --halo-blue: #0d47a1;
+    --halo-purple: #4a148c;
+    --halo-pink: #880e4f;
+    --halo-green: #1b5e20;
+    --halo-orange: #e65100;
+    --halo-teal: #006064;
+    --halo-yellow: #fbc02d;
+    --halo-black: #212121;
 }
 
-.mermaid { width: 100%; display: flex; justify-content: center; }
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+
+/* Protocol Grid Items */
+.bg-halo-pink { background-color: var(--halo-pink); }
+.text-pink-700 { color: var(--halo-pink); }
+.hover\:text-pink-600:hover { color: var(--halo-pink); }
+/* (Repeat for other colours if using Tailwind generic classes, 
+   but referencing variables in style tags in JS is cleaner) */
+
+/* Print Layout for Poster */
+@media print {
+    @page { size: A0 portrait; margin: 0; }
+    body { background: white; -webkit-print-color-adjust: exact; }
+    #app-sidebar, #ig-banner, #auth-screen, .no-print, header, nav { display: none !important; }
+    #main-content { margin: 0; padding: 0; display: none !important; }
+    
+    #print-container { 
+        display: block !important; 
+        width: 100vw; height: 100vh;
+        padding: 40px; 
+    }
+
+    .poster-layout { display: flex; flex-direction: column; height: 100%; gap: 30px; }
+    .poster-header { background: #2d2e83; color: white; padding: 40px; border-radius: 20px; }
+    .poster-header h1 { font-size: 60px; font-weight: 800; }
+    .poster-header p { font-size: 30px; opacity: 0.9; }
+
+    .poster-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        flex: 1;
+    }
+    .box { border: 4px solid #cbd5e1; padding: 30px; border-radius: 20px; }
+    .box h2 { color: #2d2e83; font-size: 32px; font-weight: 800; border-bottom: 4px solid #f36f21; margin-bottom: 20px; }
+    .box p, .box li { font-size: 20px; margin-bottom: 10px; }
+    .big { font-size: 28px !important; font-style: italic; color: #2d2e83; font-weight: bold; }
+    .grow { grid-column: 1 / -1; }
+}
