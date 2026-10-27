@@ -96,7 +96,7 @@ window.loadProjectList = async () => {
         listEl.innerHTML += `
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-rcem-purple transition-all" onclick="window.openProject('${doc.id}')">
                 <h3 class="font-bold text-lg text-slate-800">${d.meta.title}</h3>
-                <p class="text-xs text-slate-400 mt-2">Created: ${new Date(d.meta.created).toLocaleDateString()}</p>
+                <p class="text-xs text-slate-400 mt-2">Created: ${new Date(d.meta.created).toLocaleDateString('en-GB')}</p>
             </div>
         `;
     });
